@@ -1,0 +1,75 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1>My Appeals</h1>
+    <p class="content-subtitle">If a moderation decision was incorrect, you can appeal it here.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:var(--space-6);">
+    <div class="card-header">
+      <h2>Submit a New Appeal</h2>
+    </div>
+    <form method="POST" action="/appeals" style="padding:var(--space-4);">
+      <div class="form-group">
+        <label for="case_id">Case ID</label>
+        <input type="text" name="case_id" id="case_id" placeholder="Enter the case ID from the moderation notification" required>
+        <span class="form-hint">You can find the case ID in any moderation notification or decision email.</span>
+      </div>
+      <div class="form-group">
+        <label for="ground">Ground for appeal</label>
+        <select name="ground" id="ground" required>
+          <option value="">Select a ground...</option>
+          <option value="rule_misapplied">Rule was misapplied — the content did not violate the cited rule</option>
+          <option value="missing_context">Missing context — the reviewer lacked important context</option>
+          <option value="satire_parody">Satire or parody — the content was not meant seriously</option>
+          <option value="disproportional">Disproportional response — the penalty was too harsh for the violation</option>
+          <option value="procedural_error">Procedural error — the review process was not followed correctly</option>
+          <option value="new_evidence">New evidence — additional information that changes the case</option>
+          <option value="bias">Bias or conflict of interest — the reviewer had a conflict</option>
+          <option value="other">Other — a different reason not listed above</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="explanation">Explanation</label>
+        <textarea name="explanation" id="explanation" rows="5" placeholder="Explain why you believe the decision should be reconsidered. Be specific about which rule was misapplied, what context was missing, or why the penalty was disproportional." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit Appeal</button>
+    </form>
+  </div>
+
+  <div class="appeals-list">
+    <% if (appeals.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <path d="M24 6L8 13v11c0 11 7 18 16 20.5C33 42 40 35 40 24V13L24 6z" stroke="currentColor" stroke-width="2" fill="none" opacity="0.4"/>
+            <path d="M17 24l5 5 9-9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <h3>No appeals yet</h3>
+        <p>Submit an appeal above if you believe a moderation decision was incorrect.</p>
+      </div>
+    <% } else { %>
+      <h2 style="margin-bottom:var(--space-3); font-size:18px;">Your Appeals</h2>
+      <% appeals.forEach(appeal => { %>
+        <div class="appeal-card">
+          <div class="appeal-header">
+            <span class="appeal-status status-<%= appeal.status %>"><%= appeal.status %></span>
+            <span class="appeal-ground"><%= appeal.ground %></span>
+          </div>
+          <% if (appeal.post_title) { %>
+            <p class="appeal-post"><strong>Post:</strong> <%= appeal.post_title %></p>
+          <% } %>
+          <p class="appeal-explanation"><%= appeal.explanation %></p>
+          <% if (appeal.resolution) { %>
+            <div class="appeal-resolution-box">
+              <strong>Resolution:</strong> <%= appeal.resolution %>
+            </div>
+          <% } %>
+          <span class="appeal-date"><%= new Date(appeal.created_at).toLocaleDateString() %></span>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</main>

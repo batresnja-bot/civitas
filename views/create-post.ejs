@@ -1,0 +1,141 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1>Create Post</h1>
+    <p class="content-subtitle">in <%= community.name %></p>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error"><%= error %></div>
+  <% } %>
+
+  <div class="composer-card">
+    <form method="POST" action="/c/<%= community.slug %>/new" id="post-form">
+      <div class="form-group">
+        <label for="title">Title (optional)</label>
+        <input type="text" name="title" id="title" placeholder="Give your post a title" maxlength="120">
+      </div>
+
+      <div class="form-group">
+        <label for="content">Content</label>
+        <textarea name="content" id="content" rows="8" placeholder="What do you want to share?" required></textarea>
+      </div>
+
+      <div id="suggestions" class="suggestions-box" style="display:none;"></div>
+
+      <div id="rewrite-preview" class="rewrite-box" style="display:none;">
+        <div class="rewrite-header">
+          <h4>Pre-publish Suggestions</h4>
+          <span class="rewrite-badge">AI-assisted review</span>
+        </div>
+        <div id="rewrite-content"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="post_type">Post type</label>
+          <select name="post_type" id="post_type">
+            <option value="text">Text</option>
+            <option value="question">Question</option>
+            <option value="discussion">Discussion</option>
+            <option value="guide">Guide</option>
+            <option value="announcement">Announcement</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tags">Tags (comma separated)</label>
+          <input type="text" name="tags" id="tags" placeholder="e.g. help, tutorial, showcase">
+        </div>
+      </div>
+
+      <div class="composer-footer">
+        <button type="submit" class="btn btn-primary btn-lg btn-full" id="submit-btn">Post</button>
+      </div>
+    </form>
+  </div>
+
+  <% if (rules.length > 0) { %>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2>Community Rules</h2>
+      </div>
+      <div class="rules-list">
+        <% rules.forEach(rule => { %>
+          <div class="rule-card">
+            <div class="rule-header">
+              <span class="rule-number">Rule <%= rule.rule_number %></span>
+              <span class="rule-severity severity-<%= rule.severity %>"><%= rule.severity %></span>
+            </div>
+            <h3><%= rule.title %></h3>
+            <p class="rule-summary"><%= rule.summary %></p>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+</main>
+
+<script>
+  const contentEl = document.getElementById('content');
+  const suggestionsEl = document.getElementById('suggestions');
+  const rewriteEl = document.getElementById('rewrite-preview');
+  const rewriteContent = document.getElementById('rewrite-content');
+  let debounceTimer;
+
+  contentEl.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const content = contentEl.value.trim();
+      if (content.length < 10) {
+        suggestionsEl.style.display = 'none';
+        rewriteEl.style.display = 'none';
+        return;
+      }
+      fetch('/api/suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, community_id: <%= community.id %> })
+      })
+      .then(r => r.json())
+      .then(data => {
+        let hasContent = false;
+
+        if (data.suggestions && data.suggestions.length > 0) {
+          suggestionsEl.style.display = 'block';
+          suggestionsEl.innerHTML = data.suggestions.map(s => {
+            const icon = s.type === 'error' ? '🚫' : s.type === 'warning' ? '⚠' : '💡';
+            return '<div class="suggestion-item"><span class="suggestion-icon">' + icon + '</span><span>' + s.message + '</span></div>';
+          }).join('');
+          hasContent = true;
+        } else {
+          suggestionsEl.style.display = 'none';
+        }
+
+        if (data.rewrite && data.rewrite.trim()) {
+          rewriteEl.style.display = 'block';
+          rewriteContent.innerHTML = '<div class="rewrite-compare"><div class="rewrite-original"><strong>Original</strong><p>' + escapeHtml(content.substring(0, 200)) + (content.length > 200 ? '...' : '') + '</p></div><div class="rewrite-suggested"><strong>Suggested version</strong><p>' + escapeHtml(data.rewrite) + '</p></div></div>';
+          hasContent = true;
+        } else {
+          rewriteEl.style.display = 'none';
+        }
+
+        if (data.rule_warnings && data.rule_warnings.length > 0) {
+          const warnHtml = data.rule_warnings.map(w => '<div class="rule-warning"><span>⚠</span> <span>' + w + '</span></div>').join('');
+          if (hasContent) {
+            suggestionsEl.innerHTML += warnHtml;
+          } else {
+            suggestionsEl.style.display = 'block';
+            suggestionsEl.innerHTML = warnHtml;
+          }
+        }
+      });
+    }, 500);
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>

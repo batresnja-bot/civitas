@@ -1,0 +1,50 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1>Notifications</h1>
+    <% if (notifications.length > 0) { %>
+      <form method="POST" action="/notifications/read">
+        <button type="submit" class="btn btn-outline btn-sm">Mark all as read</button>
+      </form>
+    <% } %>
+  </div>
+
+  <% if (notifications.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">🔔</div>
+      <h3>No notifications yet</h3>
+      <p>You'll see notifications here when things happen.</p>
+    </div>
+  <% } else { %>
+    <div class="notifications-list">
+      <% notifications.forEach(n => { %>
+        <div class="notification-card <%= n.is_read ? '' : 'unread' %>">
+          <div class="notification-icon">
+            <% if (n.notification_type === 'comment') { %>💬
+            <% } else if (n.notification_type === 'reaction') { %>⭐
+            <% } else if (n.notification_type === 'moderation') { %>⚖
+            <% } else if (n.notification_type === 'appeal') { %>📋
+            <% } else { %>🔔
+            <% } %>
+          </div>
+          <div class="notification-content">
+            <h3><%= n.title %></h3>
+            <p><%= n.message %></p>
+            <span class="notification-time"><%= new Date(n.created_at).toLocaleDateString() %></span>
+          </div>
+          <div class="notification-actions">
+            <% if (n.link) { %>
+              <a href="<%= n.link %>" class="btn btn-outline btn-sm">View</a>
+            <% } %>
+            <% if (!n.is_read) { %>
+              <form method="POST" action="/notifications/<%= n.id %>/read" style="display:inline;">
+                <button type="submit" class="btn btn-ghost btn-sm">Mark read</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>

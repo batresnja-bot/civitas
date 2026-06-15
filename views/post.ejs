@@ -1,0 +1,96 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <div class="community-header">
+      <div>
+        <h1><%= post.title || 'Untitled Post' %></h1>
+        <p class="content-subtitle">
+          Posted by <a href="/u/<%= post.username %>"><%= post.display_name || post.username %></a>
+          in <a href="/c/<%= community.slug %>"><%= community.name %></a>
+          &middot; <%= new Date(post.created_at).toLocaleDateString() %>
+          <% if (post.post_type !== 'text') { %>
+            &middot; <span class="post-type-badge"><%= post.post_type %></span>
+          <% } %>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="post-layout">
+    <div class="post-main">
+      <div class="post-content-full"><%- post.content.replace(/\n/g, '<br>') %></div>
+
+      <% if (postTags.length > 0) { %>
+        <div class="post-tags">
+          <% postTags.forEach(tag => { %>
+            <span class="tag"><%= tag.name %></span>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <div class="post-reactions">
+        <% const reactionTypes = ['helpful', 'insightful', 'well_explained', 'constructive', 'agree']; %>
+        <% reactionTypes.forEach(type => { %>
+          <% const vote = votes.find(v => v.reaction_type === type); %>
+          <form method="POST" action="/c/<%= community.slug %>/p/<%= post.id %>/vote" class="reaction-form">
+            <input type="hidden" name="reaction_type" value="<%= type %>">
+            <button type="submit" class="reaction-btn <%= userVote && userVote.reaction_type === type ? 'active' : '' %>">
+              <%= type.replace(/_/g, ' ') %> (<%= vote ? vote.count : 0 %>)
+            </button>
+          </form>
+        <% }) %>
+        <% if (currentUser) { %>
+          <form method="POST" action="/c/<%= community.slug %>/p/<%= post.id %>/bookmark" class="reaction-form">
+            <button type="submit" class="reaction-btn <%= isBookmarked ? 'active' : '' %>">
+              <%= isBookmarked ? 'saved' : 'save' %>
+            </button>
+          </form>
+        <% } %>
+      </div>
+
+      <div class="comments-section">
+        <h2>Comments (<%= comments.length %>)</h2>
+
+        <% if (currentUser) { %>
+          <form method="POST" action="/c/<%= community.slug %>/p/<%= post.id %>/comment" class="comment-form">
+            <div class="form-group">
+              <textarea name="content" rows="3" placeholder="Add a comment..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+          </form>
+        <% } %>
+
+        <div class="comments-list">
+          <% if (comments.length === 0) { %>
+            <p class="no-comments">No comments yet. Be the first to share your thoughts.</p>
+          <% } else { %>
+            <% comments.forEach(comment => { %>
+              <div class="comment-card">
+                <div class="comment-header">
+                  <a href="/u/<%= comment.username %>" class="comment-author"><%= comment.display_name || comment.username %></a>
+                  <span class="comment-time"><%= new Date(comment.created_at).toLocaleDateString() %></span>
+                </div>
+                <p class="comment-content"><%= comment.content %></p>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="post-sidebar">
+      <div class="sidebar-card">
+        <h4>About the Author</h4>
+        <a href="/u/<%= post.username %>"><%= post.display_name || post.username %></a>
+        <p class="author-reputation">Reputation: <%= post.reputation ? post.reputation.toFixed(0) : '0' %></p>
+      </div>
+
+      <div class="sidebar-card">
+        <h4>Community</h4>
+        <a href="/c/<%= community.slug %>"><%= community.name %></a>
+        <p class="sidebar-hint"><%= community.description ? community.description.substring(0, 80) : '' %></p>
+      </div>
+    </div>
+  </div>
+</main>

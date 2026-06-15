@@ -1,0 +1,39 @@
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <%- include('logo', { size: 24 }) %>
+      <span class="nav-logo-text">Civitas</span>
+    </a>
+    <div class="nav-center">
+      <a href="/c" class="nav-link">Discover</a>
+      <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+        <a href="/dashboard" class="nav-link">Dashboard</a>
+        <a href="/moderation" class="nav-link">Review</a>
+      <% } %>
+    </div>
+    <div class="nav-actions">
+      <form method="GET" action="/search" class="nav-search" role="search">
+        <input type="text" name="q" placeholder="Search..." class="nav-search-input" aria-label="Search posts">
+      </form>
+      <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+        <a href="/notifications" class="nav-link nav-notifications" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <% if (typeof unreadCount !== 'undefined' && unreadCount > 0) { %>
+            <span class="notification-badge"><%= unreadCount %></span>
+          <% } %>
+        </a>
+        <div class="nav-profile">
+          <a href="/u/<%= currentUser.username %>" class="nav-avatar"><%= (currentUser.display_name || currentUser.username).charAt(0).toUpperCase() %></a>
+          <div class="nav-dropdown">
+            <a href="/u/<%= currentUser.username %>" class="nav-dropdown-item">Profile</a>
+            <a href="/settings" class="nav-dropdown-item">Settings</a>
+            <a href="/logout" class="nav-dropdown-item nav-dropdown-danger">Log out</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/login" class="btn btn-ghost btn-sm">Log in</a>
+        <a href="/register" class="btn btn-primary btn-sm">Get started</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

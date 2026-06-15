@@ -1,0 +1,58 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <section class="auth-section">
+    <div class="auth-card">
+      <h1>Create Proposal</h1>
+      <p class="auth-subtitle">Propose a change to <%= community.name %>'s governance.</p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/c/<%= community.slug %>/proposals/new" class="auth-form">
+        <div class="form-group">
+          <label for="title">Proposal Title</label>
+          <input type="text" name="title" id="title" placeholder="e.g. Add a rule about off-topic posts" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea name="description" id="description" rows="3" placeholder="What problem does this solve?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="current_text">Current Text (if amending existing rule)</label>
+          <textarea name="current_text" id="current_text" rows="2" placeholder="The current rule or text being changed"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="proposed_text">Proposed Text</label>
+          <textarea name="proposed_text" id="proposed_text" rows="4" placeholder="The new rule or text you're proposing" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="motivation">Motivation</label>
+          <textarea name="motivation" id="motivation" rows="2" placeholder="Why is this change needed?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="expected_benefits">Expected Benefits</label>
+          <textarea name="expected_benefits" id="expected_benefits" rows="2" placeholder="What good will this bring?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="possible_harms">Possible Harms</label>
+          <textarea name="possible_harms" id="possible_harms" rows="2" placeholder="What could go wrong?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="affected_groups">Affected Groups</label>
+          <textarea name="affected_groups" id="affected_groups" rows="1" placeholder="Who is affected by this change?"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Submit Proposal</button>
+      </form>
+    </div>
+  </section>
+</main>

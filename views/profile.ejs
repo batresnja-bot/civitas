@@ -1,0 +1,52 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1><%= profileUser.display_name || profileUser.username %></h1>
+    <p class="content-subtitle">@<%= profileUser.username %></p>
+  </div>
+
+  <div class="profile-layout">
+    <div class="profile-sidebar">
+      <div class="profile-card">
+        <% if (profileUser.bio) { %>
+          <p class="profile-bio"><%= profileUser.bio %></p>
+        <% } %>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <span class="stat-number"><%= profileUser.reputation.toFixed(0) %></span>
+            <span class="stat-label">Reputation</span>
+          </div>
+          <div class="profile-stat">
+            <span class="stat-number"><%= trustLevel ? trustLevel.name : 'Newcomer' %></span>
+            <span class="stat-label">Trust Level</span>
+          </div>
+        </div>
+        <p class="profile-joined">Joined <%= new Date(profileUser.joined_at).toLocaleDateString() %></p>
+      </div>
+    </div>
+
+    <div class="profile-main">
+      <h2>Recent Posts</h2>
+      <% if (posts.length === 0) { %>
+        <div class="empty-state">
+          <p>No posts yet.</p>
+        </div>
+      <% } else { %>
+        <div class="posts-list">
+          <% posts.forEach(post => { %>
+            <a href="/c/<%= post.community_slug %>/p/<%= post.id %>" class="post-card">
+              <div class="post-card-header">
+                <span class="post-type-badge"><%= post.post_type %></span>
+                <span class="post-community"><%= post.community_name %></span>
+              </div>
+              <h3><%= post.title %></h3>
+              <p class="post-excerpt"><%= post.content.substring(0, 150) %><%= post.content.length > 150 ? '...' : '' %></p>
+              <span class="post-time"><%= new Date(post.created_at).toLocaleDateString() %></span>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,50 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <div class="community-header">
+      <div>
+        <h1>Proposals</h1>
+        <p class="content-subtitle">Propose changes to the community's rules and governance.</p>
+      </div>
+      <% if (currentUser) { %>
+        <a href="/c/<%= community.slug %>/proposals/new" class="btn btn-primary">New Proposal</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="community-nav">
+    <a href="/c/<%= community.slug %>" class="community-nav-link">Posts</a>
+    <a href="/c/<%= community.slug %>/constitution" class="community-nav-link">Constitution</a>
+    <a href="/c/<%= community.slug %>/proposals" class="community-nav-link active">Proposals</a>
+    <a href="/c/<%= community.slug %>/health" class="community-nav-link">Health</a>
+  </div>
+
+  <div class="proposals-list">
+    <% if (proposals.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No proposals yet</h3>
+        <p>Be the first to propose a change.</p>
+        <% if (currentUser) { %>
+          <a href="/c/<%= community.slug %>/proposals/new" class="btn btn-primary">Create Proposal</a>
+        <% } %>
+      </div>
+    <% } else { %>
+      <% proposals.forEach(proposal => { %>
+        <a href="/c/<%= community.slug %>/proposals/<%= proposal.id %>" class="proposal-card" style="text-decoration:none; color:inherit;">
+          <div class="proposal-header">
+            <span class="proposal-status status-<%= proposal.status %>"><%= proposal.status %></span>
+            <span class="proposal-author"><%= proposal.display_name || proposal.username %></span>
+          </div>
+          <h3><%= proposal.title %></h3>
+          <p class="proposal-description"><%= proposal.description.substring(0, 200) %><%= proposal.description.length > 200 ? '...' : '' %></p>
+          <div class="proposal-footer">
+            <span class="proposal-date"><%= new Date(proposal.created_at).toLocaleDateString() %></span>
+            <span class="proposal-votes">Votes needed: <%= proposal.vote_threshold %></span>
+          </div>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+</main>

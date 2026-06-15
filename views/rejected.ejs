@@ -1,0 +1,33 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1>Rejected / Pending Posts</h1>
+    <p class="content-subtitle">Posts that need attention or were not approved.</p>
+  </div>
+
+  <div class="community-nav">
+    <a href="/c/<%= community.slug %>" class="community-nav-link">Back to community</a>
+  </div>
+
+  <% if (posts.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">✅</div>
+      <h3>All clear!</h3>
+      <p>You have no rejected or pending posts in this community.</p>
+    </div>
+  <% } else { %>
+    <div class="posts-list">
+      <% posts.forEach(post => { %>
+        <div class="post-card">
+          <div class="post-card-header">
+            <span class="post-badge <%= post.status %>"><%= post.status %></span>
+          </div>
+          <h3><%= post.title || 'Untitled' %></h3>
+          <p class="post-excerpt"><%= post.content.substring(0, 200) %><%= post.content.length > 200 ? '...' : '' %></p>
+          <span class="post-time"><%= new Date(post.created_at).toLocaleDateString() %></span>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>

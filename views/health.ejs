@@ -1,0 +1,98 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <div class="community-header">
+      <div>
+        <h1>Community Health</h1>
+        <p class="content-subtitle">How is <%= community.name %> doing?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="community-nav">
+    <a href="/c/<%= community.slug %>" class="community-nav-link">Posts</a>
+    <a href="/c/<%= community.slug %>/constitution" class="community-nav-link">Constitution</a>
+    <a href="/c/<%= community.slug %>/proposals" class="community-nav-link">Proposals</a>
+    <a href="/c/<%= community.slug %>/health" class="community-nav-link active">Health</a>
+  </div>
+
+  <div class="health-dashboard">
+    <div class="health-stats">
+      <div class="health-stat-card">
+        <div class="stat-number"><%= stats.memberCount %></div>
+        <div class="stat-label">Members</div>
+      </div>
+      <div class="health-stat-card">
+        <div class="stat-number"><%= stats.postCount %></div>
+        <div class="stat-label">Posts</div>
+      </div>
+      <div class="health-stat-card">
+        <div class="stat-number"><%= stats.commentCount %></div>
+        <div class="stat-label">Comments</div>
+      </div>
+      <div class="health-stat-card">
+        <div class="stat-number"><%= stats.approvedCount %></div>
+        <div class="stat-label">Approved</div>
+      </div>
+      <div class="health-stat-card">
+        <div class="stat-number"><%= stats.pendingCount %></div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="health-stat-card">
+        <div class="stat-number"><%= stats.totalVotes %></div>
+        <div class="stat-label">Reactions</div>
+      </div>
+    </div>
+
+    <div class="health-grid">
+      <div>
+        <h2>Recent Moderation Cases</h2>
+        <% if (recentCases.length === 0) { %>
+          <div class="empty-state">
+            <p>No moderation cases yet.</p>
+          </div>
+        <% } else { %>
+          <div class="cases-list">
+            <% recentCases.forEach(c => { %>
+              <div class="case-card">
+                <div class="case-header">
+                  <span class="case-type"><%= c.case_type %></span>
+                  <span class="case-status status-<%= c.status %>"><%= c.status %></span>
+                </div>
+                <% if (c.decision) { %>
+                  <p class="case-decision"><strong>Decision:</strong> <%= c.decision %></p>
+                  <% if (c.rationale) { %>
+                    <p class="case-rationale"><%= c.rationale %></p>
+                  <% } %>
+                <% } %>
+                <span class="case-date"><%= new Date(c.created_at).toLocaleDateString() %></span>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+
+      <div>
+        <h2>Top Contributors</h2>
+        <% if (topContributors.length === 0) { %>
+          <div class="empty-state">
+            <p>No contributors yet.</p>
+          </div>
+        <% } else { %>
+          <div class="top-contributors">
+            <% topContributors.forEach((contributor, i) => { %>
+              <div class="contributor-item">
+                <span class="contributor-rank"><%= i + 1 %></span>
+                <div class="contributor-info">
+                  <a href="/u/<%= contributor.username %>" class="contributor-name"><%= contributor.display_name || contributor.username %></a>
+                  <span class="contributor-stats"><%= contributor.post_count %> posts · <%= contributor.reputation.toFixed(0) %> rep</span>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</main>

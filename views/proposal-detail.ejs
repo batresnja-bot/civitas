@@ -1,0 +1,104 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1><%= proposal.title %></h1>
+  </div>
+
+  <div class="community-nav">
+    <a href="/c/<%= community.slug %>/proposals" class="community-nav-link">Back to proposals</a>
+  </div>
+
+  <div class="proposal-detail">
+    <div class="proposal-detail-header">
+      <span class="proposal-status status-<%= proposal.status %>"><%= proposal.status %></span>
+      <span class="proposal-author">Proposed by <a href="/u/<%= proposer.username %>"><%= proposer.display_name || proposer.username %></a></span>
+      <span class="proposal-date"><%= new Date(proposal.created_at).toLocaleDateString() %></span>
+    </div>
+
+    <div class="proposal-section">
+      <h3>Description</h3>
+      <p><%= proposal.description || 'No description provided.' %></p>
+    </div>
+
+    <% if (proposal.current_text) { %>
+      <div class="proposal-section">
+        <h3>Current Text</h3>
+        <div class="proposal-text-old"><%= proposal.current_text %></div>
+      </div>
+    <% } %>
+
+    <div class="proposal-section">
+      <h3>Proposed Text</h3>
+      <div class="proposal-text-new"><%= proposal.proposed_text %></div>
+    </div>
+
+    <% if (proposal.motivation) { %>
+      <div class="proposal-section">
+        <h3>Motivation</h3>
+        <p><%= proposal.motivation %></p>
+      </div>
+    <% } %>
+
+    <% if (proposal.expected_benefits) { %>
+      <div class="proposal-section">
+        <h3>Expected Benefits</h3>
+        <p><%= proposal.expected_benefits %></p>
+      </div>
+    <% } %>
+
+    <% if (proposal.possible_harms) { %>
+      <div class="proposal-section">
+        <h3>Possible Harms</h3>
+        <p><%= proposal.possible_harms %></p>
+      </div>
+    <% } %>
+
+    <% if (proposal.affected_groups) { %>
+      <div class="proposal-section">
+        <h3>Affected Groups</h3>
+        <p><%= proposal.affected_groups %></p>
+      </div>
+    <% } %>
+
+    <div class="proposal-voting">
+      <h3>Voting</h3>
+      <div class="vote-summary">
+        <div class="vote-count">
+          <span class="vote-number"><%= supportCount %></span>
+          <span class="vote-label">Support</span>
+        </div>
+        <div class="vote-count">
+          <span class="vote-number"><%= opposeCount %></span>
+          <span class="vote-label">Oppose</span>
+        </div>
+        <div class="vote-count">
+          <span class="vote-number"><%= abstainCount %></span>
+          <span class="vote-label">Abstain</span>
+        </div>
+      </div>
+      <p class="vote-threshold">Threshold: <%= proposal.vote_threshold %> votes needed</p>
+
+      <% if (currentUser && proposal.status === 'open') { %>
+        <div class="vote-actions">
+          <form method="POST" action="/c/<%= community.slug %>/proposals/<%= proposal.id %>/vote" class="vote-form">
+            <input type="hidden" name="vote" value="support">
+            <button type="submit" class="btn btn-success">Support</button>
+          </form>
+          <form method="POST" action="/c/<%= community.slug %>/proposals/<%= proposal.id %>/vote" class="vote-form">
+            <input type="hidden" name="vote" value="oppose">
+            <button type="submit" class="btn btn-danger">Oppose</button>
+          </form>
+          <form method="POST" action="/c/<%= community.slug %>/proposals/<%= proposal.id %>/vote" class="vote-form">
+            <input type="hidden" name="vote" value="abstain">
+            <button type="submit" class="btn btn-outline">Abstain</button>
+          </form>
+        </div>
+      <% } else if (!currentUser) { %>
+        <p class="vote-hint"><a href="/login">Log in</a> to vote on this proposal.</p>
+      <% } else if (proposal.status !== 'open') { %>
+        <p class="vote-hint">Voting is closed for this proposal.</p>
+      <% } %>
+    </div>
+  </div>
+</main>
