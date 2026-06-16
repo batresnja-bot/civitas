@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= mode === 'login' ? 'Log in' : 'Create account' %> — Civitas</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="auth-body">
+  <div class="auth-container">
+    <div class="auth-card">
+      <a href="/" class="auth-logo">
+        <%- include('partials/logo', { size: 28 }) %>
+        <span>Civitas</span>
+      </a>
+
+      <h1><%= mode === 'login' ? 'Welcome back' : 'Create your account' %></h1>
+      <p class="auth-subtitle"><%= mode === 'login' ? 'Continue where you left off.' : 'Join a community that works for you.' %></p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error" role="alert">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span><%= error %></span>
+        </div>
+      <% } %>
+
+      <% if (mode === 'register') { %>
+        <form method="POST" action="/register" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="Choose a username" required minlength="3" maxlength="30" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" placeholder="your@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="display_name">Display name <span class="form-hint">(optional)</span></label>
+            <input type="text" name="display_name" id="display_name" placeholder="How others will see you" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Create account</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="/login">Log in</a></p>
+      <% } else { %>
+        <form method="POST" action="/login" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="login">Username or email</label>
+            <input type="text" name="login" id="login" placeholder="Enter username or email" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Log in</button>
+        </form>
+        <p class="auth-switch">Don't have an account? <a href="/register">Sign up</a></p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

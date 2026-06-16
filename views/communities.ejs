@@ -1,0 +1,37 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1>Communities</h1>
+    <p class="content-subtitle">Join a community that shares your interests.</p>
+    <% if (currentUser) { %>
+      <a href="/c/new" class="btn btn-primary">Create Community</a>
+    <% } %>
+  </div>
+
+  <div class="communities-grid">
+    <% if (communities.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">🏗</div>
+        <h3>No communities yet</h3>
+        <p>Be the first to create a community.</p>
+        <% if (currentUser) { %>
+          <a href="/c/new" class="btn btn-primary">Create One</a>
+        <% } %>
+      </div>
+    <% } else { %>
+      <% communities.forEach(c => { %>
+        <a href="/c/<%= c.slug %>" class="community-card">
+          <div class="community-card-header">
+            <h3><%= c.name %></h3>
+            <span class="member-badge"><%= c.member_count %> members</span>
+          </div>
+          <p><%= c.description %></p>
+          <div class="community-card-footer">
+            <span class="community-template"><%= c.template %></span>
+          </div>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+</main>

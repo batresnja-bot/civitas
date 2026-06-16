@@ -1,0 +1,84 @@
+<%- include('partials/nav') %>
+<main class="container-narrow">
+  <div class="wizard">
+    <div class="wizard-step">
+      <div class="wizard-progress">
+        <span class="wizard-dot active"></span>
+        <span class="wizard-dot"></span>
+        <span class="wizard-dot"></span>
+        <span class="wizard-dot"></span>
+      </div>
+
+      <h2>Create your community</h2>
+      <p>Set up your community in minutes. You can always change these later.</p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/c/new" novalidate>
+        <div style="margin-bottom: var(--space-6);">
+          <div class="form-group">
+            <label for="name">Community name</label>
+            <input type="text" name="name" id="name" placeholder="e.g. Indie Makers Collective" required maxlength="60" autofocus>
+            <span class="form-hint">This will be used to create your community URL.</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: var(--space-6);">
+          <div class="form-group">
+            <label for="purpose">What is this community for?</label>
+            <textarea name="purpose" id="purpose" rows="3" placeholder="A community for people who build digital products and want honest peer feedback..." maxlength="500"></textarea>
+            <span class="form-hint">A short description of your community's purpose. This helps members understand what to expect.</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: var(--space-6);">
+          <label style="font-size: 14px; font-weight: 600; color: var(--gray-700); display: block; margin-bottom: var(--space-3);">Choose a template</label>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: var(--space-4);">Start with pre-built rules and settings for your type of community.</p>
+          <div class="template-grid">
+            <label class="template-card">
+              <input type="radio" name="template" value="custom" checked hidden>
+              <h4>Custom</h4>
+              <p>Start from scratch</p>
+            </label>
+            <label class="template-card">
+              <input type="radio" name="template" value="creator" hidden>
+              <h4>Creator Circle</h4>
+              <p>For paid or free creator communities</p>
+            </label>
+            <label class="template-card">
+              <input type="radio" name="template" value="course" hidden>
+              <h4>Course Cohort</h4>
+              <p>For educational groups</p>
+            </label>
+            <label class="template-card">
+              <input type="radio" name="template" value="opensource" hidden>
+              <h4>Open Source</h4>
+              <p>For project communities</p>
+            </label>
+            <label class="template-card">
+              <input type="radio" name="template" value="professional" hidden>
+              <h4>Professional Guild</h4>
+              <p>For expert communities</p>
+            </label>
+            <label class="template-card">
+              <input type="radio" name="template" value="civic" hidden>
+              <h4>Civic Group</h4>
+              <p>For deliberative communities</p>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-bottom: var(--space-6);">
+          <div class="form-group">
+            <label for="description">Description <span class="form-hint">(optional)</span></label>
+            <textarea name="description" id="description" rows="2" placeholder="A short tagline for your community..." maxlength="300"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">Create community</button>
+      </form>
+    </div>
+  </div>
+</main>

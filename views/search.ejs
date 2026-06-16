@@ -1,0 +1,38 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <h1>Search</h1>
+  </div>
+
+  <form method="GET" action="/search" class="search-form">
+    <div class="form-group">
+      <input type="text" name="q" value="<%= query %>" placeholder="Search posts..." autofocus>
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+  <% if (query && results.length === 0) { %>
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No results found</h3>
+      <p>Try different keywords.</p>
+    </div>
+  <% } else if (results.length > 0) { %>
+    <p class="search-result-count"><%= results.length %> result<%= results.length !== 1 ? 's' : '' %> for "<%= query %>"</p>
+    <div class="posts-list">
+      <% results.forEach(post => { %>
+        <a href="/c/<%= post.community_slug %>/p/<%= post.id %>" class="post-card">
+          <div class="post-card-header">
+            <span class="post-type-badge"><%= post.post_type %></span>
+            <span class="post-community"><%= post.community_name %></span>
+            <span class="post-author"><%= post.display_name || post.username %></span>
+          </div>
+          <h3><%= post.title %></h3>
+          <p class="post-excerpt"><%= post.content.substring(0, 200) %><%= post.content.length > 200 ? '...' : '' %></p>
+          <span class="post-time"><%= new Date(post.created_at).toLocaleDateString() %></span>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</main>

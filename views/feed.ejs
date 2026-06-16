@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed — Constitutional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="app-body">
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/feed" class="nav-logo">
+        <span class="nav-logo-icon">⚖️</span>
+        Constitutional
+      </a>
+      <div class="nav-center">
+        <a href="/feed" class="nav-link active">Feed</a>
+        <a href="/moderation" class="nav-link">Moderate</a>
+        <a href="/dashboard" class="nav-link">Profile</a>
+      </div>
+      <div class="nav-actions">
+        <a href="/create-post" class="btn btn-primary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          New post
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Communities</h3>
+        <ul class="sidebar-list">
+          <li>
+            <a href="/feed" class="sidebar-item <%= !activeCommunity ? 'active' : '' %>">
+              <span class="sidebar-dot">🌍</span>
+              All posts
+            </a>
+          </li>
+          <% communities.forEach(function(c) { %>
+            <li>
+              <a href="/feed?community=<%= c.id %>" class="sidebar-item <%= activeCommunity && activeCommunity.id === c.id ? 'active' : '' %>">
+                <span class="sidebar-dot">●</span>
+                <%= c.name %>
+              </a>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <a href="/community/create" class="btn btn-outline btn-full btn-sm">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          New community
+        </a>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <div class="content-header">
+        <div>
+          <h1><%= activeCommunity ? activeCommunity.name : 'All posts' %></h1>
+          <% if (activeCommunity) { %>
+            <p class="content-subtitle"><%= activeCommunity.description || 'No description' %></p>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (posts.length === 0) { %>
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <h3>No posts yet</h3>
+          <p>Be the first to share something with the community.</p>
+          <a href="/create-post" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Write a post
+          </a>
+        </div>
+      <% } else { %>
+        <div class="post-feed">
+          <% posts.forEach(function(post) { %>
+            <article class="post-card">
+              <div class="post-top">
+                <div class="post-avatar"><%= post.username.charAt(0).toUpperCase() %></div>
+                <div class="post-info">
+                  <span class="post-author"><%= post.username %></span>
+                  <span class="post-time"><%= post.created_at %></span>
+                </div>
+                <span class="post-badge approved">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  AI approved
+                </span>
+              </div>
+              <p class="post-body"><%= post.content %></p>
+              <div class="post-footer">
+                <span class="post-reaction">👍 <%= post.approve_count || 0 %></span>
+                <span class="post-reaction">👎 <%= post.reject_count || 0 %></span>
+              </div>
+            </article>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+</body>
+</html>

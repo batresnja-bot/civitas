@@ -1,0 +1,98 @@
+<%- include('partials/nav') %>
+
+<main class="container-narrow">
+  <div class="content-header">
+    <h1>Edit Constitution</h1>
+    <p class="content-subtitle">Update the rules for <%= community.name %>.</p>
+    <p style="font-size:13px; color:var(--text-muted); margin-top:var(--space-1);">
+      Use <code># Title</code> for each rule. Follow with the rule text and an optional <code>Purpose: ...</code> line.
+    </p>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error"><%= error %></div>
+  <% } %>
+
+  <div class="composer-card">
+    <form method="POST" action="/c/<%= community.slug %>/constitution/edit" id="constitution-form">
+      <div class="form-group">
+        <textarea name="content" id="constitution-content" rows="20" placeholder="# Rule 1: Be Respectful&#10;Treat everyone with respect. No personal attacks.&#10;Purpose: Maintain a welcoming environment.&#10;&#10;# Rule 2: Stay On Topic&#10;Keep posts relevant to the community purpose.&#10;Purpose: Ensure content is useful to members." required><%= constitutionText %></textarea>
+      </div>
+
+      <div id="constitution-analysis" class="analysis-panel" style="display:none;"></div>
+
+      <div style="display:flex; gap:var(--space-3); margin-top:var(--space-4);">
+        <button type="button" id="analyze-btn" class="btn btn-outline btn-lg" style="flex:1;">Analyze Constitution</button>
+        <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">Save Constitution</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card" style="margin-top:var(--space-4);">
+    <div class="card-header">
+      <h2>Writing Guide</h2>
+    </div>
+    <div style="padding:var(--space-4); font-size:14px; color:var(--gray-600); line-height:1.6;">
+      <p><strong>Good rules are:</strong></p>
+      <ul style="padding-left:var(--space-5); margin:var(--space-2) 0;">
+        <li><strong>Clear</strong> — Can a new member understand what's expected?</li>
+        <li><strong>Fair</strong> — Does it apply equally to everyone?</li>
+        <li><strong>Enforceable</strong> — Can a reviewer determine if it was violated?</li>
+        <li><strong>Necessary</strong> — Does this rule serve a real purpose?</li>
+      </ul>
+      <p><strong>Provide examples:</strong> Show what good and bad behavior look like under each rule.</p>
+      <p><strong>Include exceptions:</strong> When is the rule relaxed? (e.g., satire, self-defense, educational context)</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.getElementById('analyze-btn').addEventListener('click', function() {
+    const content = document.getElementById('constitution-content').value.trim();
+    const analysisEl = document.getElementById('constitution-analysis');
+    if (!content) {
+      analysisEl.style.display = 'block';
+      analysisEl.innerHTML = '<div class="analysis-error">Please write some rules before analyzing.</div>';
+      return;
+    }
+    analysisEl.style.display = 'block';
+    analysisEl.innerHTML = '<div class="analysis-loading">Analyzing constitution...</div>';
+    fetch('/api/constitution-analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    })
+    .then(r => r.json())
+    .then(data => {
+      let html = '<div class="analysis-results">';
+      html += '<h3 style="margin-bottom:var(--space-3);">Constitution Quality Analysis</h3>';
+      if (data.overall) {
+        html += '<div class="analysis-dimension"><span class="analysis-label">Overall</span><span class="analysis-score score-' + data.overall.toLowerCase() + '">' + data.overall + '</span></div>';
+      }
+      if (data.dimensions) {
+        data.dimensions.forEach(d => {
+          html += '<div class="analysis-dimension"><span class="analysis-label">' + d.name + '</span><span class="analysis-score score-' + d.score.toLowerCase() + '">' + d.score + '</span></div>';
+          if (d.reason) html += '<p class="analysis-reason">' + d.reason + '</p>';
+        });
+      }
+      if (data.warnings && data.warnings.length) {
+        html += '<div class="analysis-warnings"><strong>Warnings</strong><ul>';
+        data.warnings.forEach(w => { html += '<li>' + w + '</li>'; });
+        html += '</ul></div>';
+      }
+      if (data.suggestions && data.suggestions.length) {
+        html += '<div class="analysis-suggestions"><strong>Suggestions</strong><ul>';
+        data.suggestions.forEach(s => { html += '<li>' + s + '</li>'; });
+        html += '</ul></div>';
+      }
+      if (data.rule_count !== undefined) {
+        html += '<p class="analysis-meta"><strong>' + data.rule_count + '</strong> rules detected</p>';
+      }
+      html += '</div>';
+      analysisEl.innerHTML = html;
+    })
+    .catch(() => {
+      analysisEl.innerHTML = '<div class="analysis-error">Analysis failed. Please try again.</div>';
+    });
+  });
+</script>

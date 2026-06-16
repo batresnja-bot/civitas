@@ -1,0 +1,61 @@
+<%- include('partials/nav') %>
+
+<main class="container">
+  <div class="content-header">
+    <div class="community-header">
+      <div>
+        <h1>Constitution</h1>
+        <p class="content-subtitle"><%= community.name %>'s rules and principles.</p>
+      </div>
+      <% if (typeof currentUser !== 'undefined' && currentUser && isMember && (isMember.role === 'owner' || isMember.role === 'admin')) { %>
+        <a href="/c/<%= community.slug %>/constitution/edit" class="btn btn-primary btn-sm">Edit Constitution</a>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="community-nav">
+    <a href="/c/<%= community.slug %>" class="community-nav-link">Posts</a>
+    <a href="/c/<%= community.slug %>/constitution" class="community-nav-link active">Constitution</a>
+    <a href="/c/<%= community.slug %>/proposals" class="community-nav-link">Proposals</a>
+    <a href="/c/<%= community.slug %>/health" class="community-nav-link">Health</a>
+  </div>
+
+  <% if (!constitution) { %>
+    <div class="empty-state">
+      <div class="empty-icon">📜</div>
+      <h3>No constitution yet</h3>
+      <p>This community hasn't adopted a constitution.</p>
+      <% if (typeof currentUser !== 'undefined' && currentUser && isMember && (isMember.role === 'owner' || isMember.role === 'admin')) { %>
+        <a href="/c/<%= community.slug %>/constitution/edit" class="btn btn-primary">Create Constitution</a>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="constitution-viewer">
+      <div class="constitution-header">
+        <h2>Community Constitution</h2>
+        <span class="constitution-version">Version <%= constitution.version %></span>
+        <span class="constitution-status status-active">Active</span>
+      </div>
+
+      <div class="rules-list">
+        <% if (rules.length === 0) { %>
+          <p class="no-rules">No rules defined yet.</p>
+        <% } else { %>
+          <% rules.forEach(rule => { %>
+            <div class="rule-card">
+              <div class="rule-header">
+                <span class="rule-number">Rule <%= rule.rule_number %></span>
+                <span class="rule-severity severity-<%= rule.severity %>"><%= rule.severity %></span>
+              </div>
+              <h3><%= rule.title %></h3>
+              <p class="rule-summary"><%= rule.summary %></p>
+              <% if (rule.purpose) { %>
+                <p class="rule-purpose"><strong>Purpose:</strong> <%= rule.purpose %></p>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</main>

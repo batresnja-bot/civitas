@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Design tokens. Warm off-white canvas, one confident "iris" primary, a warm
+  amber accent, and three semantic moderation colors (approved / borderline /
+  rejected). Colors are RGB channel triples so Tailwind can apply opacity.
+*/
+:root {
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Civitas brand: calm authority + human warmth. */
+  --c-bg: 248 250 252; /* cloud (slate-50) */
+  --c-surface: 255 255 255;
+  --c-elevated: 255 255 255;
+  --c-ivory: 255 248 237; /* warm human areas */
+  --c-border: 226 232 240; /* slate-200 */
+  --c-text: 15 23 42; /* navy — headings + strong text */
+  --c-muted: 100 116 139; /* slate-500 muted text */
+  --c-panel: 241 245 249; /* slate-100, second neutral layer */
+
+  --c-navy: 15 23 42;
+  --c-primary: 37 99 235; /* blue-600 — primary actions */
+  --c-primary-fg: 255 255 255;
+  --c-primary-soft: 219 234 254; /* blue-100 */
+  --c-primary-strong: 30 64 175; /* blue-800 — text on soft/tinted backgrounds (AA) */
+
+  --c-teal: 15 118 110; /* trust / constructive contribution */
+  --c-purple: 124 58 237; /* community improvements / governance */
+  --c-accent: 15 118 110; /* default accent = trust teal */
+
+  --c-approved: 22 163 74; /* resolved green */
+  --c-borderline: 245 158 11; /* pending amber */
+  --c-rejected: 220 38 38; /* serious red */
+
+  --radius: 0.875rem;
+}
+
+@layer base {
+  * {
+    border-color: rgb(var(--c-border));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    /* faint brand-tinted glow at the top, not a flat fill */
+    background-image: radial-gradient(60rem 30rem at 50% -8rem, rgb(var(--c-primary) / 0.06), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-ink;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-bg;
+  }
+
+  ::selection {
+    background: rgb(var(--c-primary) / 0.18);
+  }
+}
+
+@layer components {
+  /* Staggered entrance for lists: set --i on each child for the delay. */
+  .stagger > * {
+    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
