@@ -1,7 +1,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, 'data.db');
+const DB_PATH = process.env.CIVITAS_DB_PATH || path.join(__dirname, 'data.db');
 
 function initDB() {
   const db = new Database(DB_PATH);
@@ -265,6 +265,15 @@ function initDB() {
       post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
       created_at TEXT DEFAULT (datetime('now')),
       UNIQUE(user_id, post_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS user_reputation_dimensions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      dimension TEXT NOT NULL,
+      score REAL DEFAULT 0,
+      updated_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(user_id, dimension)
     );
 
     CREATE INDEX IF NOT EXISTS idx_posts_community ON posts(community_id);

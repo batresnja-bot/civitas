@@ -1,3 +1,9 @@
+<%# Most views render only this partial + a <main>, with no document <head>.
+    Pull the stylesheet and fonts in here so every such page is styled.
+    (Browsers honor stylesheet links placed in the body.) %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
 <nav class="nav">
   <div class="nav-inner">
     <a href="/" class="nav-logo">

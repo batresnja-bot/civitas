@@ -5,6 +5,8 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const fs = require('fs');
 const db = require('./db');
 const { moderate, getPrePublishSuggestions, analyzeConstitution } = require('./moderation');
 const { updateReputation, getTrustLevel, TRUST_LEVELS } = require('./reputation');
@@ -14,19 +16,44 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
-app.set('views', './views');
+// Absolute paths so views/static resolve no matter what CWD the app is launched
+// from (relative paths were the cause of unstyled pages).
+app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
+const isProd = process.env.NODE_ENV === 'production';
+if (isProd) app.set('trust proxy', 1); // secure cookies behind a hosting proxy
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
+  cookie: { secure: isProd, httpOnly: true, sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 },
 }));
 
 app.use(securityHeaders);
+
+// Health check for hosting platforms (Koyeb, etc.).
+app.get('/healthz', (req, res) => {
+  res.json({ status: 'ok', demo: process.env.CIVITAS_DEMO_MODE === 'true', uptime: process.uptime() });
+});
+
+// JSON API for the SPA client — mounted before the HTML rate limiter and the
+// EJS res.locals middleware (which regenerates the CSRF token each request).
+app.use('/api', require('./api')());
+
+// Serve the built React SPA at /app (single-process deploy, no Vite needed).
+// Falls through gracefully if the client hasn't been built yet.
+const clientDist = path.join(__dirname, 'client', 'dist');
+if (fs.existsSync(path.join(clientDist, 'index.html'))) {
+  app.use('/app', express.static(clientDist));
+  app.get(/^\/app(\/.*)?$/, (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
+  // Make the polished SPA the front door; the classic EJS app stays reachable
+  // at its own routes (e.g. /c, /proposals) for features not yet in the SPA.
+  app.get('/', (req, res) => res.redirect('/app/'));
+}
+
 app.use(ipRateLimit);
 
 app.use((req, res, next) => {
@@ -457,5 +484,7 @@ app.use((err, req, res, next) => { console.error('ERROR:', err.message); res.sta
 // START
 const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
 if (userCount === 0) require('./seed')();
-app.listen(PORT, () => console.log('Civitas running at http://localhost:' + PORT));
+if (require.main === module) {
+  app.listen(PORT, () => console.log('Civitas running at http://localhost:' + PORT));
+}
 module.exports = app;

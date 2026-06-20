@@ -1,0 +1,22 @@
+# Render Blueprint — one-service public demo for Civitas.
+# Deploy: push this repo to GitHub, then on render.com choose
+# "New +" → "Blueprint" → pick the repo. Render reads this file.
+#
+# No database service needed: the app seeds SQLite on boot (the demo banner
+# warns that data may reset). For persistence later, add a Postgres adapter.
+services:
+  - type: web
+    name: civitas
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CIVITAS_DEMO_MODE
+        value: 'true'
+      - key: SESSION_SECRET
+        generateValue: true

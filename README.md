@@ -1,151 +1,185 @@
 # Civitas
 
-A governance operating system for online communities. Transparent rules, AI-assisted moderation, community review, and constitutional governance — without a full-time admin.
+### Trust, made visible. Decisions, made explainable.
 
-## What It Is
+Civitas is a **transparent trust-diagnostic layer for online communities**.
+Communities rarely collapse all at once — they decay quietly: newcomers get
+ignored, helpers burn out, rules get vague, and decisions feel arbitrary. Civitas
+surfaces those fractures early and pairs every moderation decision with a clear,
+appealable **Decision Receipt**.
 
-Civitas gives your community:
-- A **constitution** with clear, plain-language rules
-- **AI-assisted screening** that checks every post against your rules (pattern-based, not ML)
-- **Community review** for borderline cases
-- **Transparent appeals** so decisions can be challenged
-- **Trust levels** that reward accurate contributors
-- **Governance proposals** for evolving your community's rules
+![Civitas demo](docs/screenshots/demo.gif)
 
-## Quick Start
+> ⚠️ Civitas is a **prototype / demo**, not production infrastructure. Screening
+> is **transparent pattern-matching, not a large ML model** — and it's honest
+> about that by design. See [`ETHICS.md`](ETHICS.md) and [`SECURITY.md`](SECURITY.md).
+
+**Live demo:** _set your deployed URL here_ · **Case study:** `/case-study` ·
+**About the builder:** `/about-builder`
+
+## ⭐ The core idea: Decision Receipts
+
+Most platforms remove content silently — the #1 reason moderation feels
+arbitrary. Civitas attaches a **Decision Receipt** to every consequential action:
+*what happened, the rule, the exact reason, who reviewed it, what's next, and how
+to appeal.* It's the emotional and intellectual center of the project — full spec
+in [`docs/DECISION_RECEIPTS.md`](docs/DECISION_RECEIPTS.md).
+
+## Screenshots
+
+Add captures to `docs/screenshots/`: `landing.png`, `trust-radar.png`,
+`decision-receipt.png`, `post-coach.png`, `weekly-report.png`.
+
+---
+
+## Why this exists
+
+Online communities don't fail only because of toxic content. They fail when
+**trust breaks** — rules are unclear, decisions feel arbitrary, moderators burn
+out, newcomers get ignored, AI feels like a black box, and there's no way to
+appeal. Civitas is a layer that repairs that.
+
+## Vision: Trust Receipts for the information economy
+
+Civitas starts as a focused community-moderation demo: Trust Radar, Post Coach,
+Newcomer Rescue, Decision Receipts, and Weekly Trust Reports for online communities.
+That is the working artifact.
+
+The broader thesis is **Trust Receipts**: the idea that consequential claims,
+ratings, and decisions should come with an explainable, verifiable, appealable
+record of the reasoning behind them.
+
+Today, Civitas demonstrates that principle in community governance. Over time,
+the same receipt model could extend to media-literacy workflows, financial and
+ESG claims, institutional communication, and AI-assisted decisions — but those
+are roadmap directions, not claims about the current demo.
+
+The standard is simple: don't ask people to trust a black box. Show the receipt.
+
+## The five pillars
+
+1. **Trust Radar** — detects where trust is breaking right now (ignored
+   newcomers, ageing review queue, rules causing confusion, drifting
+   contributors) as clear insight cards with recommended actions.
+2. **Post Coach** — community-aware help while writing, so posts get better
+   answers instead of being removed. Live status + concrete suggestions.
+3. **Newcomer Rescue** — surfaces first-time posters waiting for a reply so a
+   helper can welcome them before they give up and leave.
+4. **Decision Receipts** — every moderation decision explained: what happened,
+   the relevant norm, the reason, who reviewed it, what's next, and how to appeal.
+5. **Weekly Trust Report** — a founder report on what improved, what needs
+   attention, and the few actions that matter most next week.
+
+Community Charter and Member-powered Review remain as supporting systems.
+
+## Why programming communities first
+
+Programming help communities make trust problems easy to see: vague questions,
+mocked beginners, repeated answers, helper burnout, and unclear norms around
+criticism. Civitas starts with **Programming Help Hub**, then expands to course,
+creator, open-source, indie-maker, professional, and peer-support communities.
+
+## Screenshots
+
+Add images to `docs/screenshots/` and reference them here:
+
+1. `landing.png` — landing page
+2. `trust-radar.png` — the Trust Radar command center
+3. `post-coach.png` — Post Coach in action
+4. `newcomer-rescue.png` — the Newcomer Rescue queue
+5. `decision-receipt.png` — a decision receipt
+6. `weekly-trust-report.png` — the weekly trust report
+
+## Tech stack
+
+- **Server:** Node.js + Express 5, JSON API under `/api`
+- **Client:** React 18 + TypeScript + Vite + Tailwind, TanStack Query, React Router
+- **Database:** SQLite locally (better-sqlite3); Postgres targeted for the public demo
+- **Auth:** express-session + bcryptjs, CSRF-protected mutations
+- **Moderation:** transparent, pattern-based engine (extensible)
+- **Tests:** Vitest (+ supertest for the API, Testing Library for the client)
+
+## Architecture
+
+A single Express server serves the JSON API (`/api`), the built React SPA
+(`/app`, and `/` redirects there), and the classic EJS routes for legacy
+governance flows. The SPA is the default, marketing-first experience.
+
+```
+.
+├── app.js            # Express: /healthz, /api mount, SPA at /app, classic routes
+├── api/              # JSON API + tests
+├── db.js             # SQLite schema (CIVITAS_DB_PATH / DATABASE_URL aware)
+├── moderation.js     # toxicity + charter evaluation + Post Coach suggestions
+├── reputation.js     # multi-dimensional trust levels
+├── security.js       # CSRF, rate limiting, headers
+├── seed.js           # demo data
+├── views/ public/    # classic EJS app + assets
+└── client/           # React + Vite + Tailwind SPA (served at /app)
+    └── src/{lib,components,pages,styles,config.ts}
+```
+
+## Local setup
+
+Node 18+ (Node 22 recommended).
 
 ```bash
-cd constitutional-moderation
 npm install
-node app.js
+npm start            # http://localhost:3000  (SPA at /, API at /api)
 ```
 
-Open http://localhost:3000
+Develop the SPA with hot reload:
 
-The database seeds automatically with demo data (8 users, 3 communities, 10 posts).
-
-**Demo accounts** (password: `password123`):
-- `sarah_chen` — Community owner
-- `alex_rivera` — Regular member
-- `jordan_park` — Member
-
-## How It Works
-
-### 1. Write Your Constitution
-Each community defines rules with titles, summaries, and purposes. Rules have severity levels (critical/standard/minor).
-
-### 2. AI Screens Every Post
-Posts are scored against two dimensions:
-- **Toxicity detection** — profanity, threats, insults, hate speech, spam
-- **Constitutional evaluation** — checks against your community's rules
-
-Posts land in three buckets:
-- **Approved** — goes live immediately
-- **Rejected** — blocked, user can appeal
-- **Borderline** — sent to community review
-
-### 3. Community Reviews Borderline Cases
-Trusted members review edge cases with full context. Decisions include rationale.
-
-### 4. Appeals & Precedents
-Rejected posts can be appealed. Decisions build precedent over time.
-
-### 5. Trust Earns Influence
-Multi-dimensional reputation system:
-
-| Level | Title | Points | Permissions |
-|-------|-------|--------|-------------|
-| 0 | Newcomer | 0 | Post, comment, react |
-| 1 | Contributor | 10 | + bookmark, follow |
-| 2 | Trusted Member | 50 | + create tags |
-| 3 | Established | 150 | + nominate reviewers |
-| 4 | Guardian | 400 | + review content |
-| 5 | Elder | 1000 | Full permissions |
-
-### 6. Propose Changes
-Members can propose changes to the constitution. Proposals go through a workflow: Draft → Open → Discussion → Voting → Approved/Rejected.
-
-## Features
-
-- **Communities** — Create and join communities
-- **Posts** — Text, questions, discussions, guides, announcements
-- **Comments** — Threaded comments with moderation
-- **Reactions** — helpful, insightful, well_explained, constructive, agree
-- **Tags** — Categorize posts within communities
-- **Bookmarks** — Save posts for later
-- **Notifications** — Get notified about comments, reactions, moderation decisions
-- **Search** — Find posts across communities
-- **User Profiles** — Reputation, trust level, post history
-- **Community Health** — Dashboard with stats, top contributors, moderation cases
-- **Audit Log** — Track all important actions
-- **Rate Limiting** — IP-based and auth-based rate limits
-- **Security Headers** — XSS protection, nosniff, CSRF tokens
-
-## Tech Stack
-
-- **Backend:** Node.js + Express 5
-- **Database:** SQLite (via better-sqlite3)
-- **Templates:** EJS
-- **Auth:** bcryptjs + express-session
-- **Moderation:** Pattern-based engine (extensible)
-
-## File Structure
-
-```
-constitutional-moderation/
-├── app.js              # Express server, all routes
-├── db.js               # SQLite schema (20+ tables)
-├── moderation.js       # Pattern-based toxicity engine
-├── reputation.js       # Multi-dimensional trust system
-├── security.js         # CSRF, rate limiting, headers
-├── seed.js             # Demo data seeder
-├── .env                # Environment variables
-├── .gitignore          # Git ignore rules
-├── package.json        # Dependencies
-├── views/
-│   ├── partials/
-│   │   └── nav.ejs         # Navigation bar
-│   ├── index.ejs           # Landing page
-│   ├── auth.ejs            # Login/Register
-│   ├── communities.ejs     # Community list
-│   ├── community.ejs       # Single community
-│   ├── create-community.ejs
-│   ├── constitution.ejs    # View constitution
-│   ├── edit-constitution.ejs
-│   ├── create-post.ejs     # New post
-│   ├── post.ejs            # Single post + comments
-│   ├── moderation.ejs      # Review queue
-│   ├── dashboard.ejs       # User dashboard
-│   ├── notifications.ejs   # Notification center
-│   ├── settings.ejs        # Profile settings
-│   ├── profile.ejs         # Public profile
-│   ├── proposals.ejs       # Governance proposals
-│   ├── proposal-detail.ejs # Single proposal
-│   ├── create-proposal.ejs # New proposal
-│   ├── appeals.ejs         # Appeal tracking
-│   ├── health.ejs          # Community health
-│   ├── rejected.ejs        # Rejected/pending posts
-│   ├── search.ejs          # Search results
-│   └── error.ejs           # Error page
-└── public/
-    └── style.css           # Complete CSS
+```bash
+cd client && npm install && npm run dev   # http://localhost:5173/app/ (proxies /api)
 ```
 
-## Limitations
+Production build (single process serves everything):
 
-- Pattern-based moderation (not real ML) — upgradeable to OpenAI/Perspective API
-- No email verification (registration is username/password)
-- No real-time updates (no WebSockets)
-- No file uploads or images
-- Single-server only (SQLite)
-
-## Environment Variables
-
-Create `.env`:
+```bash
+npm run build        # builds the SPA into client/dist
+npm start            # serves it at http://localhost:3000
 ```
-SESSION_SECRET=your-random-secret-here
-PORT=3000
-```
+
+### Windows / PowerShell
+
+If scripts are blocked, use `npm.cmd install` / `npm.cmd start`, or run
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. If port 3000 is busy:
+`netstat -ano | findstr :3000` then `taskkill /PID <pid> /F`.
+
+## Demo accounts
+
+Password `password123`: `sarah_chen` (founder/owner), `jordan_park` (member),
+`alex_rivera` (reviewer). With `CIVITAS_DEMO_MODE=true`, no credentials are
+needed — the landing and login pages show **View as Founder / Member / Reviewer**
+buttons.
+
+## Free deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for a zero-cost public demo on Koyeb +
+Supabase, including environment variables, build/start commands, the `/healthz`
+check, and honest free-tier limitations.
+
+## Roadmap
+
+- Deeper Decision Receipts + appeals in the SPA
+- Trust Dashboard v1 with health labels (Strong / Stable / Needs attention / At risk)
+- Postgres adapter for production; SQLite stays for local dev
+- Review Center for member-powered review
+- Real AI-provider integration behind the Post Coach interface
+- Privacy-friendly analytics adapter (Plausible/Umami)
+
+## Product philosophy
+
+Help before punishment. Explain before enforcing. Make trust visible. Keep
+governance lightweight. Protect members and reviewers. Be honest about AI.
+
+## Security & privacy notes
+
+Session-cookie auth, CSRF-protected mutations, security headers, and basic rate
+limiting. The demo is not intended for sensitive data. The moderation engine is
+pattern-based and will make mistakes — that's exactly why Decision Receipts and
+appeals exist.
 
 ## License
 
