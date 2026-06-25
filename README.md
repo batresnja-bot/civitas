@@ -14,7 +14,7 @@ appealable **Decision Receipt**.
 > is **transparent pattern-matching, not a large ML model** — and it's honest
 > about that by design. See [`ETHICS.md`](ETHICS.md) and [`SECURITY.md`](SECURITY.md).
 
-**Live demo:** _set your deployed URL here_ · **Case study:** `/case-study` ·
+**Live demo:** https://civitas-bfwo.onrender.com · **Case study:** `/case-study` ·
 **About the builder:** `/about-builder`
 
 ## ⭐ The core idea: Decision Receipts
@@ -184,3 +184,4 @@ appeals exist.
 ## License
 
 ISC
+

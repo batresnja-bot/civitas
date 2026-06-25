@@ -17,3 +17,4 @@ export const SITE = {
     'A transparent trust-diagnostic demo for online communities — and a proof point for explainable trust infrastructure. Civitas shows where trust is breaking and explains every decision with an appealable receipt.',
   trustLine: 'A product experiment about AI, trust, and healthier online communities.',
 };
+
